@@ -1,25 +1,25 @@
 package com.chat.vortex.group.model;
 
 import java.util.UUID;
-import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-
-import com.chat.vortex.group.model.Member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.chat.vortex.group.model.Role;
 
-@Table("group_server")
+@Table("member")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupServer {
+public class Member {
   @Id
+  private UUID memberId;
+  private UUID userId;
+  private Role role;
   private UUID groupId;
-  private String groupName;
-  private UUID ownerId;
 }
