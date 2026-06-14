@@ -1,20 +1,20 @@
-package com.chat.vortex.shared.model;
+package com.chat.vortex.group.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Role {
-  ADMIN("admin"),
-  MEMBER("member"),
-  MODERATOR("moderator");
+    ADMIN("admin"),
+    MEMBER("member"),
+    MODERATOR("moderator");
 
-  private final String value;
+    private final String value;
 
-  Role(String value) {
-    this.value = value;
-  }
+    Role(String value) {
+        this.value = value;
+    }
 
-  @JsonValue
-  public String getValue() {
-    return value;
-  }
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
 }

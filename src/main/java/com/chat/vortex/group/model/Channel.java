@@ -16,7 +16,6 @@ import lombok.Setter;
 public class Channel {
   @Id
   private UUID channelId;
-  @Id
   private UUID groupId;
   private String channelName;
   private ChannelType type;
