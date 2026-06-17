@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+
+import com.chat.vortex.kafka.event.Event;
 import com.chat.vortex.kafka.event.MessageCreatedEvent;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
@@ -18,7 +20,7 @@ public class KafkaProduerConfig {
 
     // We need to change the MessageCreatedEvent to implement Event to become less annoying
     @Bean
-    public ProducerFactory<String, MessageCreatedEvent> producerFactory() {
+    public ProducerFactory<String, Event> producerFactory() {
 
         Map<String, Object> config = new HashMap<>();
 
@@ -44,7 +46,7 @@ public class KafkaProduerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, MessageCreatedEvent> kafkaTemplate() {
+    public KafkaTemplate<String, Event> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

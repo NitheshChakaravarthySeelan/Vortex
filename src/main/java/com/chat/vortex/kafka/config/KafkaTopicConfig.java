@@ -16,5 +16,13 @@ public class KafkaTopicConfig {
             .replicas(1)
             .build();
     }
+    @Bean
+    public NewTopic channelTopic() {
+        return TopicBuilder
+            .name("channels")
+            .partitions(2)
+            .replicas(1)
+            .build();
+    }
 
 }

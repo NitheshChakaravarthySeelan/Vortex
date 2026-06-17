@@ -2,7 +2,7 @@ package com.chat.vortex.group.services;
 
 import java.util.UUID;
 
-import com.chat.vortex.group.model.Message;
+import com.chat.vortex.chat.model.Message;
 
 import reactor.core.publisher.Mono;
 

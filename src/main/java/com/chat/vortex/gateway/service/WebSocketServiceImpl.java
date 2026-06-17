@@ -1,57 +1,55 @@
 package com.chat.vortex.gateway.service;
 
-import org.apache.catalina.valves.JsonErrorReportValve;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
+import com.chat.vortex.gateway.dispatcher.PacketDispatcher;
 import com.chat.vortex.shared.model.Packet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Implementation of the WebSocketService that processes incoming WebSocket connections.
+ * It is responsible for parsing raw text messages into standard Packets and forwarding
+ * them to the PacketDispatcher.
+ */
 @Service
 public class WebSocketServiceImpl implements WebSocketService{
    
     private final ObjectMapper objectMapper;
+    private final PacketDispatcher packetDispatcher;
 
-    public WebSocketServiceImpl(ObjectMapper objectMapper) {
+    /**
+     * Constructs a WebSocketServiceImpl with the necessary dependencies.
+     * 
+     * @param objectMapper The Jackson object mapper for JSON deserialization.
+     * @param packetDispatcher The dispatcher to route packets to the appropriate handler.
+     */
+    public WebSocketServiceImpl(ObjectMapper objectMapper, PacketDispatcher packetDispatcher) {
         this.objectMapper = objectMapper;
+        this.packetDispatcher = packetDispatcher;
     }
     
-    // Using session we can create a websocketmessage to send over internet cause
-    // browser does not have to intelligence to know that.
+    /**
+     * Handles the active WebSocket session by continuously receiving messages,
+     * converting them from JSON to Packet objects, and dispatching them.
+     * 
+     * @param session The active user WebSocket session.
+     * @return A Mono that completes when the session is closed.
+     */
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-
-    Flux<Packet> output = 
-        session.receive()
-        // Extract it here
-        .map(msg -> msg.getPayloadAsText())
-        // Deserialize it here
-        .map(payload ->  { try {
-            return objectMapper.readValue(payload, Packet.class) } 
-        catch (Exception e) {
-            new JsonErrorReportValve();
-        }});
-
-    // validate packet
-
-    // check permission
-    
-
-    // Save to db
-
-    // publish to kafka 
-    // We can just map out everything in the above syntax
-
-    // Serialize the msg back
-    String json = objectMapper.writeValueAsString(output);
-    // convert it back to websocketmessage to send it via internet 
-    WebSocketMessage response = session.textMessage(json);
-
-    // TODO: I think we need to send to a pub / sub
-    return session.send(Flux.just(response));
-   }
+        return session.receive()
+            .map(msg -> msg.getPayloadAsText())
+            .map(payload -> {
+                try {
+                    return objectMapper.readValue(payload, Packet.class);
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to parse packet", e);
+                }
+            })
+            .doOnNext(packet -> packetDispatcher.dispatch(packet, session))
+            .then();
+    }
 }
