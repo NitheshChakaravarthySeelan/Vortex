@@ -45,7 +45,6 @@ public class SessionRegistry {
      */
     public void addSession(String sessionId, UUID userId) {
         sessionToUserMap.put(sessionId, userId);
-        sessionToChannelsMap.computeIfAbsent(sessionId, k -> ConcurrentHashMap.newKeySet()).add(userId);
     }
 
     /**

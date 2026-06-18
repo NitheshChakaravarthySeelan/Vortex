@@ -2,6 +2,7 @@ package com.chat.vortex.gateway.config;
 
 import com.chat.vortex.gateway.handler.MyWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
@@ -44,13 +45,8 @@ public class WebConfig {
         return new WebSocketHandlerAdapter();
     }
 
-    /**
-     * Provides the ObjectMapper bean for JSON serialization and deserialization.
-     * 
-     * @return An ObjectMapper instance.
-     */
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper().registerModule(new JavaTimeModule());
     }
 }

@@ -48,7 +48,7 @@ public class MessageCreateService {
          userId,
          chatMessage.getChannelId(),
          chatMessage.getContent(),
-         Instant.now()
+         Instant.now().toEpochMilli()
       );
 
       try {

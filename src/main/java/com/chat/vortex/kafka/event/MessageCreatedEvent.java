@@ -1,6 +1,5 @@
 package com.chat.vortex.kafka.event;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +37,7 @@ public class MessageCreatedEvent extends Event{
     private String content;
     
     /**
-     * The exact timestamp when the message was successfully created.
+     * The exact timestamp (epoch millis) when the message was successfully created.
      */
-    private Instant createdAt;
+    private Long createdAt;
 }

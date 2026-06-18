@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 public interface UserRepository extends ReactiveCrudRepository<User, UUID> {
   Mono<User> findByUserName(String userName);
 
-  // Check whether if a user existByEmail already to avoid duplicate
-  Mono<User> existByEmail(String email);
+  Mono<Boolean> existsByEmail(String email);
 
 }

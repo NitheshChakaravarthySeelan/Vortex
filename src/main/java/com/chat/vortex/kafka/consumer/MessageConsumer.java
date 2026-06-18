@@ -4,6 +4,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
+import java.time.Instant;
+import java.util.Set;
+
 import com.chat.vortex.chat.model.Message;
 import com.chat.vortex.chat.repository.MessageRepository;
 import com.chat.vortex.kafka.event.Event;
@@ -13,7 +16,6 @@ import com.chat.vortex.shared.model.OperationType;
 import com.chat.vortex.shared.model.Packet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
-import java.util.Set;
 
 @Service
 public class MessageConsumer implements Consumer{
@@ -39,7 +41,7 @@ public class MessageConsumer implements Consumer{
                 messageCreatedEvent.getMessageId(),
                 messageCreatedEvent.getUserId(),
                 messageCreatedEvent.getChannelId(),
-                messageCreatedEvent.getCreatedAt(),
+                Instant.ofEpochMilli(messageCreatedEvent.getCreatedAt()),
                 messageCreatedEvent.getContent()
             );
             messageRepository.save(message);

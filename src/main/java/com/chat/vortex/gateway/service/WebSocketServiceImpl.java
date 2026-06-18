@@ -1,5 +1,7 @@
 package com.chat.vortex.gateway.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
@@ -9,35 +11,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Mono;
 
-/**
- * Implementation of the WebSocketService that processes incoming WebSocket connections.
- * It is responsible for parsing raw text messages into standard Packets and forwarding
- * them to the PacketDispatcher.
- */
 @Service
-public class WebSocketServiceImpl implements WebSocketService{
-   
+public class WebSocketServiceImpl implements WebSocketService {
+
+    private static final Logger log = LoggerFactory.getLogger(WebSocketServiceImpl.class);
     private final ObjectMapper objectMapper;
     private final PacketDispatcher packetDispatcher;
 
-    /**
-     * Constructs a WebSocketServiceImpl with the necessary dependencies.
-     * 
-     * @param objectMapper The Jackson object mapper for JSON deserialization.
-     * @param packetDispatcher The dispatcher to route packets to the appropriate handler.
-     */
     public WebSocketServiceImpl(ObjectMapper objectMapper, PacketDispatcher packetDispatcher) {
         this.objectMapper = objectMapper;
         this.packetDispatcher = packetDispatcher;
     }
-    
-    /**
-     * Handles the active WebSocket session by continuously receiving messages,
-     * converting them from JSON to Packet objects, and dispatching them.
-     * 
-     * @param session The active user WebSocket session.
-     * @return A Mono that completes when the session is closed.
-     */
+
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         return session.receive()
@@ -49,7 +34,14 @@ public class WebSocketServiceImpl implements WebSocketService{
                     throw new RuntimeException("Failed to parse packet", e);
                 }
             })
-            .doOnNext(packet -> packetDispatcher.dispatch(packet, session))
+            .doOnNext(packet -> {
+                try {
+                    packetDispatcher.dispatch(packet, session);
+                } catch (Exception e) {
+                    log.error("Error handling packet {}: {}", packet.operation(), e.getMessage(), e);
+                }
+            })
+            .doOnError(e -> log.error("WebSocket error: {}", e.getMessage(), e))
             .then();
     }
 }
